@@ -5,11 +5,20 @@ body {
 }
 
 .container {
+  width: 100%;
+  display: grid;
+  grid-template-rows: 1fr 400px 400px 400px 400px;
+  gap: 1em;
+}
+
+@media only screen and (min-width: 700px) {
+.container {
   width: 900px;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 100px 400px 400px;
+  grid-template-rows: 80px 400px 400px;
   gap: 1em;
+}
 }
 
 .item {
@@ -27,11 +36,19 @@ body {
 } 
 
 .header {
-  grid-column: 1 / 3;
+  font-size: 80%;
+}
+
+@media only screen and (min-width: 700px) {
+  .header {
+    grid-column: 1 / 3;
+    font-size: 80%;
+  }
 }
 
 .header h1 {
   margin: 0;
+  text-align: center;
 }
 
 .pic {
@@ -48,11 +65,12 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 2em;
+  font-size: 1.5em;
 }
 
 a {
   text-decoration: none;
+  text-align: center;
 }
 
 .mp1 .pic {
