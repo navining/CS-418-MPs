@@ -1,5 +1,6 @@
 /**
- * @file A 2-D animation of the University of Illinois logo.
+ * @file CS 418 Iteractive Computer Graphics MP1
+ * @description A 2-D animation of the University of Illinois logo and a bouncing ball.
  * @author Navi Ning <xning5@illinois.edu>
  */
 
