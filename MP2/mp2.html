@@ -1,0 +1,145 @@
+<!-- CS 418 Iteractive Computer Graphics MP2 -->
+<!-- @author Navi Ning <xning5@illinois.edu> -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>MP2</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+  <script type="text/javascript" src="gl-matrix-min.js"></script>
+  <script type="text/javascript" src="mp2.js"></script>
+  <script type="text/javascript" src="Terrain.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script id="shader-vs" type="x-shader/x-vertex">
+    attribute vec3 aVertexNormal;
+    attribute vec3 aVertexPosition;
+   
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+    uniform mat3 uNMatrix;
+    
+    uniform vec3 uLightPosition;
+    uniform vec3 uAmbientLightColor;
+    uniform vec3 uDiffuseLightColor;
+    uniform vec3 uSpecularLightColor;
+    
+    uniform vec3 uKAmbient;
+    uniform vec3 uKDiffuse;
+    uniform vec3 uKSpecular;
+    uniform float uShininess;
+    
+    varying vec4 vColor;
+
+    void main(void) {
+    
+    // Get the vertex position in eye coordinates
+    vec4 vertexPositionEye4 = uMVMatrix * vec4(aVertexPosition, 1.0);
+    vec3 vertexPositionEye3 = vertexPositionEye4.xyz / vertexPositionEye4.w;
+  
+    // Calculate the vector (l) to the light source
+    vec3 vectorToLightSource = normalize(uLightPosition - vertexPositionEye3);
+    
+    // Transform the normal (n) to eye coordinates
+    vec3 normalEye = normalize(uNMatrix * aVertexNormal);
+    
+    // Calculate n dot l for diffuse lighting
+    float diffuseLightWeightning = max(dot(normalEye, 
+                                    vectorToLightSource), 0.0);
+                                       
+    // Calculate the reflection vector (r) that is needed for specular light
+    vec3 reflectionVector = normalize(reflect(-vectorToLightSource, 
+                                             normalEye));
+    
+    // The camera in eye coordinates is located in the origin and is pointing
+    // along the negative z-axis. Calculate viewVector (v) 
+    // in eye coordinates as:
+    // (0.0, 0.0, 0.0) - vertexPositionEye3
+    vec3 viewVectorEye = -normalize(vertexPositionEye3);
+    
+    float rdotv = max(dot(reflectionVector, viewVectorEye), 0.0);
+    
+    float specularLightWeightning = pow(rdotv, uShininess);
+
+    // Sum up all three reflection components and send to the fragment shader
+    vColor = vec4(((uAmbientLightColor*uKAmbient)
+                + (uDiffuseLightColor*uKDiffuse) * diffuseLightWeightning
+                + ((uSpecularLightColor*uKSpecular) * specularLightWeightning)),1.0);
+    gl_Position = uPMatrix*uMVMatrix*vec4(aVertexPosition, 1.0);
+    }
+</script>
+
+  <script id="shader-fs" type="x-shader/x-fragment">
+precision mediump float;
+varying vec4 vColor;
+void main(void) {
+        gl_FragColor = vColor;
+ }
+</script>
+
+  <style>
+    body {
+      color: white;
+      margin: 0;
+    }
+
+    canvas {
+      width: 100vw;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      z-index: -1;
+    }
+
+    .content {
+      display: flex;
+      justify-content: center;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 36px;
+    }
+
+    h2 {
+      font-weight: unset;
+      text-align: center;
+      font-size: 20px;
+    }
+
+    #input_form {
+      position: fixed;
+      bottom: 5vh;
+    }
+
+    input {
+      padding: 7px;
+      margin-left: 20px;
+    }
+
+    input[type="button"] {
+      margin-right: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body onload="main();">
+  <canvas id="glCanvas"></canvas>
+
+  <h1>MP2: Terrain Modeling Part 1</h1>
+  <h2>Author: Navi Ning</h2>
+  <div class="content">
+    <form id="input_form">
+      <fieldset>
+        <legend>Rendering Mode</legend>
+        <input type="radio" name="primitive" id="wireframe" value="wireframe"> Wireframe
+        <input type="radio" name="primitive" id="polygon" id="polygon" value="polygon" checked> Polygon
+        <input type="radio" name="primitive" id="wirepoly" value="wirepoly"> Polygon with Edges
+        <input type="button" name="primitive" id="generate" value="Generate" onclick="setupBuffers();">
+      </fieldset>
+    </form>
+  </div>
+</body>
+
+</html>
