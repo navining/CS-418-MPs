@@ -261,6 +261,8 @@ function setupShaders() {
   shaderProgram.uniformAmbientMaterialColorLoc = gl.getUniformLocation(shaderProgram, "uKAmbient");
   shaderProgram.uniformDiffuseMaterialColorLoc = gl.getUniformLocation(shaderProgram, "uKDiffuse");
   shaderProgram.uniformSpecularMaterialColorLoc = gl.getUniformLocation(shaderProgram, "uKSpecular");
+  shaderProgram.uniformMaxZLoc = gl.getUniformLocation(shaderProgram, "maxZ");
+  shaderProgram.uniformMinZLoc = gl.getUniformLocation(shaderProgram, "minZ");
 }
 
 //-------------------------------------------------------------------------
@@ -293,6 +295,15 @@ function setLightUniforms(loc, a, d, s) {
   gl.uniform3fv(shaderProgram.uniformSpecularLightColorLoc, s);
 }
 
+/**
+ * Sends maxZ and minZ to the shader
+ * @param {Float32} maxZ 
+ * @param {Float32} minZ 
+ */
+function setZUniforms(maxZ, minZ) {
+  gl.uniform1f(shaderProgram.uniformMaxZLoc, maxZ);
+  gl.uniform1f(shaderProgram.uniformMinZLoc, minZ);
+}
 //----------------------------------------------------------------------------------
 /**
  * Populate buffers with data
@@ -328,6 +339,7 @@ function draw() {
   glMatrix.mat4.rotateX(mvMatrix, mvMatrix, degToRad(-90));
   setMatrixUniforms();
   setLightUniforms(lightPosition, lAmbient, lDiffuse, lSpecular);
+  setZUniforms(myTerrain.maxZ, myTerrain.minZ);
 
   if ((document.getElementById("polygon").checked) || (document.getElementById("wirepoly").checked)) {
     setMaterialUniforms(shininess, kAmbient, kTerrainDiffuse, kSpecular);

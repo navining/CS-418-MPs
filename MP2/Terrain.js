@@ -173,8 +173,8 @@ class Terrain {
     }
 
     this.numVertices = this.vBuffer.length / 3;
-
     this.updateVertices();
+    this.getMinZMaxZ();
 
     for (var i = 0; i < this.div; i++) {
       for (var j = 0; j < this.div; j++) {
@@ -193,6 +193,18 @@ class Terrain {
 
     this.updateNormals();
 
+  }
+
+  /**
+   * Get minZ and maxZ
+   */
+  getMinZMaxZ() {
+    this.maxZ = -Infinity;
+    this.minZ = Infinity;
+    for (var i = 0; i < this.numVertices; i++) {
+      if (this.vBuffer[i * 3 + 2] < this.minZ) this.minZ = this.vBuffer[i * 3 + 2];
+      if (this.vBuffer[i * 3 + 2] > this.maxZ) this.maxZ = this.vBuffer[i * 3 + 2];
+    }
   }
 
   /**
