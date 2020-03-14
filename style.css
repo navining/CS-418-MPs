@@ -77,6 +77,10 @@ a {
   background-image: url("assets/mp1.png");
 }
 
-.mp2 .pic {
-  background-image: url("assets/mp2.png");
+.mp2-1 .pic {
+  background-image: url("assets/mp2-1.png");
+}
+
+.mp2-2 .pic {
+  background-image: url("assets/mp2-2.png");
 }
