@@ -2,7 +2,8 @@
 Machine Problems of CS 418 Interactive Computer Graphics:
 
 - MP1: Dancing Logo
-- MP2: Terrain Modeling Part 1
+- MP2-1: Terrain Modeling
+- MP2-2: Flight Simulator
 
 This repo is only for personal study. 
 
