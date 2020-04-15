@@ -84,3 +84,7 @@ a {
 .mp2-2 .pic {
   background-image: url("assets/mp2-2.png");
 }
+
+.mp3 .pic {
+  background-image: url("assets/mp3.png");
+}
