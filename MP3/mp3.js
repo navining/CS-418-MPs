@@ -1,4 +1,3 @@
-
 /**
  * @file MP3 - Environment Mapping
  * @author Eric Shaffer <shaffer1@illinois.edu>  
@@ -29,6 +28,9 @@ var pMatrix = mat4.create();
 /** @global The Normal matrix */
 var nMatrix = mat3.create();
 
+/** @global The Reverse matrix */
+var rMatrix = mat4.create();
+
 /** @global The matrix stack for hierarchical modeling */
 var mvMatrixStack = [];
 
@@ -40,7 +42,7 @@ var skyBox;
 
 // View parameters
 /** @global Location of the camera in world coordinates */
-var eyePt = vec3.fromValues(0.0, 0.0, 2.3);
+var eyePt = vec3.fromValues(0.215, 1.575, 15.0);
 /** @global Direction of the view in world coordinates */
 var viewDir = vec3.fromValues(0.0, 0.0, -1.0);
 /** @global Up vector for view matrix creation, in world coordinates */
@@ -50,7 +52,7 @@ var viewPt = vec3.fromValues(0.0, 0.0, 0.0);
 
 //Light parameters
 /** @global Light position in VIEW coordinates */
-var lightPosition = [5, 5, 5];
+var lightPosition = [-1, -1, 1];
 /** @global Ambient light color/intensity for Phong reflection */
 var lAmbient = [1, 1, 1];
 /** @global Diffuse light color/intensity for Phong reflection */
@@ -64,9 +66,9 @@ var kAmbient = [0.0, 0.0, 0.0];
 /** @global Diffuse material color/intensity for Phong reflection */
 var kTerrainDiffuse = [205.0 / 255.0, 163.0 / 255.0, 63.0 / 255.0];
 /** @global Specular material color/intensity for Phong reflection */
-var kSpecular = [0.5, 0.5, 0.5];
+var kSpecular = [1, 1, 1];
 /** @global Shininess exponent for Phong reflection */
-var shininess = 30;
+var shininess = 20;
 /** @global Edge color fpr wireframeish rendering */
 var kEdgeBlack = [0.0, 0.0, 0.0];
 /** @global Edge color for wireframe rendering */
@@ -102,6 +104,7 @@ function asyncGetFile(url) {
  */
 function uploadModelViewMatrixToShader() {
   gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
+  gl.uniformMatrix4fv(shaderProgram.rMatrixUniform, false, rMatrix);
 }
 
 //-------------------------------------------------------------------------
@@ -274,6 +277,7 @@ function setupShaders() {
   shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
   shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
   shaderProgram.nMatrixUniform = gl.getUniformLocation(shaderProgram, "uNMatrix");
+  shaderProgram.rMatrixUniform = gl.getUniformLocation(shaderProgram, "uRMatrix");
   shaderProgram.uniformLightPositionLoc = gl.getUniformLocation(shaderProgram, "uLightPosition");
   shaderProgram.uniformAmbientLightColorLoc = gl.getUniformLocation(shaderProgram, "uAmbientLightColor");
   shaderProgram.uniformDiffuseLightColorLoc = gl.getUniformLocation(shaderProgram, "uDiffuseLightColor");
@@ -397,24 +401,20 @@ function draw() {
   // Then generate the lookat matrix and initialize the view matrix to that view
   mat4.lookAt(vMatrix, eyePt, viewPt, up);
 
+  lightPosition = [-20, 20, -10];
+
   //Draw Mesh
   //ADD an if statement to prevent early drawing of myMesh
   if (myMesh.loaded() && skyBox.loaded()) {
     mvPushMatrix();
-    // Mesh position
-    mat4.scale(mvMatrix, mvMatrix, [0.15, 0.15, 0.15]);
-    var minXYZ = [0, 0, 0];
-    var maxXYZ = [0, 0, 0];
-    [minXYZ, maxXYZ] = myMesh.getAABB(minXYZ, maxXYZ);
-    var center = [(minXYZ[0] + maxXYZ[0]) * 0.5, (minXYZ[1] + maxXYZ[1]) * 0.5, (minXYZ[2] + maxXYZ[2]) * 0.5, 0];
-    vec4.negate(center, center);
-    mat4.translate(mvMatrix, mvMatrix, center);
 
     mat4.rotateX(mvMatrix, mvMatrix, degToRad(eulerX));
     mat4.rotateY(mvMatrix, mvMatrix, degToRad(eulerY));
     mat4.multiply(mvMatrix, vMatrix, mvMatrix);
+    mat4.invert(rMatrix, mvMatrix);
+    vec3.transformMat4(lightPosition, lightPosition, mvMatrix);
 
-    mvPushMatrix()
+    mvPushMatrix();
     mat4.rotateY(mvMatrix, mvMatrix, degToRad(meshY));
 
     setMatrixUniforms();
@@ -447,8 +447,7 @@ function draw() {
       myMesh.drawEdges();
     }
 
-    mvPopMatrix()
-
+    mvPopMatrix();
     // Draw Skybox
     setSkyBoxMatrixUniforms();
     skyBox.drawTriangles();

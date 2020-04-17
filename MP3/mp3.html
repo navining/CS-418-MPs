@@ -76,6 +76,7 @@
   attribute vec3 aVertexPosition;
  
   uniform mat4 uMVMatrix;
+  uniform mat4 uRMatrix;
   uniform mat4 uPMatrix;
   uniform mat3 uNMatrix;
   uniform int uMode;
@@ -95,10 +96,13 @@
 
     gl_Position = uPMatrix*uMVMatrix*vec4(aVertexPosition, 1.0);
 
+    vec3 eyePos = normalize(mat3(uRMatrix) * vPosition);
+    vec3 N = normalize(mat3(uRMatrix) * vNormal);
+
     if (uMode == 2) {
-      vDirection = reflect(vPosition, vNormal);
+      vDirection = reflect(eyePos, N);
     } else if (uMode == 3) {
-      vDirection = refract(vPosition, vNormal, 1.50);
+      vDirection = refract(eyePos, N, 1.00/1.52);
     }
   }
 </script>
@@ -153,10 +157,10 @@
                 + ((uSpecularLightColor*uKSpecular) * specularLightWeightning)),1.0);
     } else if (uMode == 2) {
       // Reflective
-      gl_FragColor = textureCube(uSkybox, vDirection);
+      gl_FragColor = textureCube(uSkybox, normalize(vDirection));
     } else {
       // Refractive
-      vec4 color = textureCube(uSkybox, vDirection);
+      vec4 color = textureCube(uSkybox, normalize(vDirection));
       color = mix(color, vec4(1,1,1,1), 0.1);
       gl_FragColor = color;
     }
