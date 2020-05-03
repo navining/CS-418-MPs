@@ -7,7 +7,7 @@ body {
 .container {
   width: 100%;
   display: grid;
-  grid-template-rows: 1fr 400px 400px 400px 400px;
+  grid-template-rows: 1fr 400px 400px 400px 400px 400px 400px 10px;
   gap: 1em;
 }
 
@@ -16,7 +16,7 @@ body {
   width: 900px;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 80px 400px 400px;
+  grid-template-rows: 80px 400px 400px 400px 10px;
   gap: 1em;
 }
 }
@@ -73,6 +73,21 @@ a {
   text-align: center;
 }
 
+
+.footer {
+
+}
+
+@media only screen and (min-width: 700px) {
+.footer {
+  grid-column: 1 / 3;
+}
+}
+
+.footer .info {
+  text-align: center;
+}
+
 .mp1 .pic {
   background-image: url("assets/mp1.png");
 }
@@ -87,4 +102,8 @@ a {
 
 .mp3 .pic {
   background-image: url("assets/mp3.png");
+}
+
+.mp4 .pic {
+  background-image: url("assets/mp4.png");
 }
