@@ -107,3 +107,7 @@ a {
 .mp4 .pic {
   background-image: url("assets/mp4.png");
 }
+
+.project .pic {
+  background-image: url("assets/project.png");
+}
